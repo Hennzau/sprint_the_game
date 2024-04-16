@@ -1,12 +1,4 @@
-use wgpu::{
-    Device,
-    LoadOp,
-    Operations,
-    Queue,
-    RenderPassColorAttachment,
-    RenderPassDescriptor,
-    Surface,
-};
+use wgpu::{Device, LoadOp, Operations, Queue, RenderPassColorAttachment, RenderPassDescriptor, Surface, SurfaceConfiguration};
 
 use crate::logic::{
     edit::EditLogic,
@@ -37,9 +29,9 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn new() -> Self {
+    pub fn new(device: &Device, queue: &Queue, config: &SurfaceConfiguration) -> Self {
         return Self {
-            menu: MenuRenderer::new(),
+            menu: MenuRenderer::new(device, queue, config),
             play: PlayRenderer::new(),
             victory: VictoryRenderer::new(),
             edit: EditRenderer::new(),
@@ -53,6 +45,13 @@ impl Renderer {
             State::Victory => self.victory.update(victory),
             State::Edit => self.edit.update(edit),
         }
+    }
+
+    pub fn process_resize(&mut self, (width, height): (u32, u32), queue: &Queue) {
+        self.menu.process_resize((width, height), queue);
+        self.play.process_resize((width, height), queue);
+        self.victory.process_resize((width, height), queue);
+        self.edit.process_resize((width, height), queue);
     }
 
     pub fn render(&self, state: &State, device: &Device, surface: &Surface, queue: &Queue) {
@@ -74,7 +73,7 @@ impl Renderer {
                     view: &view,
                     resolve_target: None,
                     ops: Operations {
-                        load: LoadOp::Clear(wgpu::Color::RED),
+                        load: LoadOp::Clear(wgpu::Color::BLACK),
                         store: wgpu::StoreOp::Store,
                     },
                 })],
