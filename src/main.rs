@@ -87,79 +87,68 @@ fn main() {
 
     let (_instance, surface, mut config, adapter, device, queue) = pollster::block_on(build_backend(&window));
 
-    let application = Application::new();
+    let mut application = Application::new();
 
     let start = Instant::now();
-    let mut last_frame_time = start.elapsed();
     let mut last_tick_time = start.elapsed();
     let mut last_timer_time = start.elapsed();
 
-    const FRAME_RATE: f32 = 1.0 / 120.0;
-    const TICK_RATE: f32 = 1.0 / 60.0;
-
-    let mut ticks = 0usize;
-    let mut frames = 0usize;
+    let mut frames = 0;
 
     'main: loop {
         let now = start.elapsed();
         let delta_time = (now - last_tick_time).as_secs_f32();
+        last_tick_time = now;
 
-        if delta_time > TICK_RATE {
-            last_tick_time += Duration::from_secs_f32(TICK_RATE);
+        application.update(delta_time);
 
-            ticks += 1;
-        } else if delta_time > FRAME_RATE {
-            last_frame_time += Duration::from_secs_f32(FRAME_RATE);
+        let timeout = Some(Duration::ZERO);
+        let status = event_loop.pump_events(timeout, |event, target| {
+            match event {
+                Event::AboutToWait => window.request_redraw(),
+                Event::WindowEvent {
+                    event,
+                    ..
+                } => {
+                    match event {
+                        WindowEvent::Resized(new_size) => {
+                            config.width = new_size.width.max(1);
+                            config.height = new_size.height.max(1);
 
-            let timeout = Some(Duration::ZERO);
-            let status = event_loop.pump_events(timeout, |event, target| {
-                match event {
-                    Event::AboutToWait => window.request_redraw(),
-                    Event::WindowEvent {
-                        event,
-                        ..
-                    } => {
-                        match event {
-                            WindowEvent::Resized(new_size) => {
-                                config.width = new_size.width.max(1);
-                                config.height = new_size.height.max(1);
+                            surface.configure(&device, &config);
 
-                                surface.configure(&device, &config);
-
-                                window.request_redraw();
-                            }
-                            WindowEvent::CloseRequested => target.exit(),
-                            WindowEvent::RedrawRequested => {}
-                            WindowEvent::KeyboardInput {
-                                event,
-                                ..
-                            } => {}
-                            WindowEvent::MouseInput {
-                                state,
-                                button,
-                                ..
-                            } => {}
-                            _ => {}
+                            window.request_redraw();
                         }
+                        WindowEvent::CloseRequested => target.exit(),
+                        WindowEvent::RedrawRequested => application.render(&device, &surface, &queue),
+                        WindowEvent::KeyboardInput {
+                            event,
+                            ..
+                        } => {}
+                        WindowEvent::MouseInput {
+                            state,
+                            button,
+                            ..
+                        } => {}
+                        _ => {}
                     }
-                    _ => {}
                 }
-            });
-
-            if let PumpStatus::Exit(_) = status {
-                break 'main;
+                _ => {}
             }
+        });
 
-            frames += 1;
+        if let PumpStatus::Exit(_) = status {
+            break 'main;
         }
+
+        frames += 1;
 
         if (now - last_timer_time).as_secs_f32() > 1.0 {
             last_timer_time += Duration::from_secs_f32(1.0);
 
-            println!("Sprint The Game is running at {} tps and {} fps", ticks, frames);
+            println!("Sprint The Game is running at {} fps", frames);
 
             frames = 0;
-            ticks = 0;
         }
     }
 }

@@ -1,16 +1,12 @@
+use wgpu::{
+    Device,
+    Surface,
+    Queue,
+};
+
 use crate::{
-    logic::{
-        edit::EditLogic,
-        menu::MenuLogic,
-        play::PlayLogic,
-        victory::VictoryLogic,
-    },
-    renderer::{
-        edit::EditRenderer,
-        menu::MenuRenderer,
-        play::PlayRenderer,
-        victory::VictoryRenderer,
-    },
+    logic::Logic,
+    renderer::Renderer,
 };
 
 pub enum State {
@@ -19,43 +15,6 @@ pub enum State {
     Victory,
     Edit,
 }
-
-struct Logic {
-    pub menu: MenuLogic,
-    pub play: PlayLogic,
-    pub victory: VictoryLogic,
-    pub edit: EditLogic,
-}
-
-impl Logic {
-    pub fn new() -> Self {
-        return Self {
-            menu: MenuLogic::new(),
-            play: PlayLogic::new(),
-            victory: VictoryLogic::new(),
-            edit: EditLogic::new(),
-        };
-    }
-}
-
-struct Renderer {
-    pub menu: MenuRenderer,
-    pub play: PlayRenderer,
-    pub victory: VictoryRenderer,
-    pub edit: EditRenderer,
-}
-
-impl Renderer {
-    pub fn new() -> Self {
-        return Self {
-            menu: MenuRenderer::new(),
-            play: PlayRenderer::new(),
-            victory: VictoryRenderer::new(),
-            edit: EditRenderer::new(),
-        };
-    }
-}
-
 
 pub struct Application {
     state: State,
@@ -67,13 +26,18 @@ pub struct Application {
 impl Application {
     pub fn new() -> Self {
         return Self {
-            state: State::Menu,
+            state: State::Play,
             logic: Logic::new(),
             renderer: Renderer::new(),
         };
     }
 
-    pub fn update(&mut self, delta_time: f32) {}
+    pub fn update(&mut self, delta_time: f32) {
+        self.logic.update(&self.state, delta_time);
+        self.renderer.update(&self.state, &self.logic.menu, &self.logic.play, &self.logic.victory, &self.logic.edit);
+    }
 
-    pub fn render(&self) {}
+    pub fn render(&self, device: &Device, surface: &Surface, queue: &Queue) {
+        self.renderer.render(&self.state, device, surface, queue);
+    }
 }
