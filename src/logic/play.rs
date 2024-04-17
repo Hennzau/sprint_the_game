@@ -1,6 +1,8 @@
 pub mod level;
 
-pub struct PlayLogic {}
+pub struct PlayLogic {
+
+}
 
 impl PlayLogic {
     pub fn new() -> Self {

@@ -21,7 +21,7 @@ pub struct Application {
 
 impl Application {
     pub fn new(device: &Device, surface: &Surface, adapter: &Adapter, queue: &Queue, config: &SurfaceConfiguration) -> Self {
-        let state = State::Play;
+        let state = State::Menu;
         let logic = Logic::new();
         let renderer = Renderer::new(&logic.menu, &logic.play, &logic.victory, &logic.edit, device, surface, adapter, queue, config);
 

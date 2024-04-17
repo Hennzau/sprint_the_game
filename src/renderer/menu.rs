@@ -2,6 +2,7 @@ use wgpu::{Device, MultisampleState, Queue, RenderPass, SurfaceConfiguration};
 use wgpu_text::{BrushBuilder, TextBrush};
 use wgpu_text::glyph_brush::ab_glyph::FontRef;
 use wgpu_text::glyph_brush::{BuiltInLineBreaker, Layout, Section, Text};
+use winit::dpi::LogicalPosition;
 
 use crate::logic::menu::MenuLogic;
 use crate::renderer::palette::{IVORY, RED};
@@ -21,18 +22,33 @@ impl MenuRenderer {
         );
         let text = "SPRINT THE GAME".to_string();
 
-        let section = Section::default()
+        let title = Section::default()
             .add_text(
                 Text::new(&text)
                     .with_scale(60.0)
                     .with_color([IVORY.0 as f32 / 255.0, IVORY.1 as f32 / 255.0, IVORY.2 as f32 / 255.0, 1.0]),
             )
+            .with_screen_position(LogicalPosition::new(500, 500))
             .with_layout(
                 Layout::default()
                     .line_breaker(BuiltInLineBreaker::AnyCharLineBreaker),
             );
 
-        match brush.queue(&device, &queue, vec![&section]) {
+        let text = "Select Level to Start".to_string();
+
+        let info = Section::default()
+            .add_text(
+                Text::new(&text)
+                    .with_scale(60.0)
+                    .with_color([IVORY.0 as f32 / 255.0, IVORY.1 as f32 / 255.0, IVORY.2 as f32 / 255.0, 1.0]),
+            )
+            .with_screen_position(LogicalPosition::new(600, 600))
+            .with_layout(
+                Layout::default()
+                    .line_breaker(BuiltInLineBreaker::AnyCharLineBreaker),
+            );
+
+        match brush.queue(&device, &queue, vec![&title, &info]) {
             Ok(_) => (),
             Err(err) => {
                 panic!("{err}");

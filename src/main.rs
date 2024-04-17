@@ -82,8 +82,20 @@ fn main() {
     let window = builder
         .with_title("Sprint The Game")
         .with_inner_size(LogicalSize::new(1280, 720))
-        .with_position(LogicalPosition::new((((1920.0 / 1.25) - 1280.0) / 2.0) as u32, (((1080.0 / 1.25) - 720.0) / 2.0) as u32))
+        .with_resizable(false)
         .build(&event_loop).unwrap();
+
+    if let Some(monitor) = window.current_monitor() {
+        let screen_size = monitor.size();
+        let window_size = window.outer_size();
+
+        window.set_outer_position(winit::dpi::PhysicalPosition {
+            x: screen_size.width.saturating_sub(window_size.width) as f64 / 2.
+                + monitor.position().x as f64,
+            y: screen_size.height.saturating_sub(window_size.height) as f64 / 2.
+                + monitor.position().y as f64,
+        });
+    }
 
     let (_instance, surface, mut config, adapter, device, queue) = pollster::block_on(build_backend(&window));
 
