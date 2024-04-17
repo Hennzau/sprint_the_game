@@ -4,7 +4,7 @@ use crate::logic::victory::VictoryLogic;
 pub struct VictoryRenderer {}
 
 impl VictoryRenderer {
-    pub fn new() -> Self {
+    pub fn new(logic: &VictoryLogic) -> Self {
         return Self {};
     }
 

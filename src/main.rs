@@ -87,7 +87,7 @@ fn main() {
 
     let (_instance, surface, mut config, adapter, device, queue) = pollster::block_on(build_backend(&window));
 
-    let mut application = Application::new(&device, &queue, &config);
+    let mut application = Application::new(&device, &surface, &adapter, &queue, &config);
 
     let start = Instant::now();
     let mut last_tick_time = start.elapsed();
@@ -117,7 +117,7 @@ fn main() {
 
                             surface.configure(&device, &config);
 
-
+                            application.process_resize((new_size.width, new_size.height), &queue);
 
                             window.request_redraw();
                         }

@@ -4,7 +4,7 @@ use crate::logic::edit::EditLogic;
 pub struct EditRenderer {}
 
 impl EditRenderer {
-    pub fn new() -> Self {
+    pub fn new(logic: &EditLogic) -> Self {
         return Self {};
     }
 

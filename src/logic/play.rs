@@ -1,3 +1,5 @@
+pub mod level;
+
 pub struct PlayLogic {}
 
 impl PlayLogic {
@@ -5,5 +7,5 @@ impl PlayLogic {
         return Self {};
     }
 
-    pub fn update (&mut self, delta_time: f32) {}
+    pub fn update(&mut self, delta_time: f32) {}
 }

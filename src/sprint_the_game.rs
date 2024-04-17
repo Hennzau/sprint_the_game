@@ -1,4 +1,4 @@
-use wgpu::{Device, Surface, Queue, SurfaceConfiguration};
+use wgpu::{Device, Surface, Queue, SurfaceConfiguration, Adapter};
 
 use crate::{
     logic::Logic,
@@ -20,11 +20,15 @@ pub struct Application {
 }
 
 impl Application {
-    pub fn new(device: &Device, queue: &Queue, config: &SurfaceConfiguration) -> Self {
+    pub fn new(device: &Device, surface: &Surface, adapter: &Adapter, queue: &Queue, config: &SurfaceConfiguration) -> Self {
+        let state = State::Play;
+        let logic = Logic::new();
+        let renderer = Renderer::new(&logic.menu, &logic.play, &logic.victory, &logic.edit, device, surface, adapter, queue, config);
+
         return Self {
-            state: State::Menu,
-            logic: Logic::new(),
-            renderer: Renderer::new(device, queue, config),
+            state,
+            logic,
+            renderer,
         };
     }
 

@@ -1,0 +1,10 @@
+pub const RED: (u8, u8, u8) = (220, 20, 60);
+pub const BLUE: (u8, u8, u8) = (106, 90, 205);
+pub const GREEN: (u8, u8, u8) = (154, 205, 50);
+pub const YELLOW: (u8, u8, u8) = (255, 215, 0);
+pub const DARKGREY: (u8, u8, u8) = (105, 105, 105);
+pub const DARKBLUE: (u8, u8, u8) = (2, 4, 55);
+pub const INCREASED_DARKBLUE: (u8, u8, u8) = (0, 0, 51);
+pub const IVORY: (u8, u8, u8) = (255, 255, 212);
+pub const VOLKSWAGEN_TAUPE: (u8, u8, u8) = (140, 134, 128);
+pub const BLACK: (u8, u8, u8) = (0, 0, 0);

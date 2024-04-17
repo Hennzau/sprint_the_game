@@ -1,4 +1,5 @@
-use wgpu::{Device, LoadOp, Operations, Queue, RenderPassColorAttachment, RenderPassDescriptor, Surface, SurfaceConfiguration};
+use bytemuck::{Pod, Zeroable};
+use wgpu::{Adapter, Device, LoadOp, Operations, Queue, RenderPassColorAttachment, RenderPassDescriptor, Surface, SurfaceConfiguration};
 
 use crate::logic::{
     edit::EditLogic,
@@ -13,6 +14,7 @@ use crate::renderer::{
     play::PlayRenderer,
     victory::VictoryRenderer,
 };
+use crate::renderer::palette::{BLACK, INCREASED_DARKBLUE};
 
 use crate::sprint_the_game::State;
 
@@ -20,6 +22,16 @@ pub mod menu;
 pub mod play;
 pub mod victory;
 pub mod edit;
+
+pub mod palette;
+pub mod quad;
+
+#[repr(C)]
+#[derive(Clone, Copy, Pod, Zeroable)]
+pub struct ColorVertex {
+    position: [f32; 2],
+    color: [u8; 4],
+}
 
 pub struct Renderer {
     pub menu: MenuRenderer,
@@ -29,12 +41,12 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn new(device: &Device, queue: &Queue, config: &SurfaceConfiguration) -> Self {
+    pub fn new(menu: &MenuLogic, play: &PlayLogic, victory: &VictoryLogic, edit: &EditLogic, device: &Device, surface: &Surface, adapter: &Adapter, queue: &Queue, config: &SurfaceConfiguration) -> Self {
         return Self {
-            menu: MenuRenderer::new(device, queue, config),
-            play: PlayRenderer::new(),
-            victory: VictoryRenderer::new(),
-            edit: EditRenderer::new(),
+            menu: MenuRenderer::new(menu, device, queue, config),
+            play: PlayRenderer::new(play, device, surface, adapter, config),
+            victory: VictoryRenderer::new(victory),
+            edit: EditRenderer::new(edit),
         };
     }
 
@@ -73,7 +85,12 @@ impl Renderer {
                     view: &view,
                     resolve_target: None,
                     ops: Operations {
-                        load: LoadOp::Clear(wgpu::Color::BLACK),
+                        load: LoadOp::Clear(wgpu::Color {
+                            r: BLACK.0 as f64 / 255.0,
+                            g: BLACK.1 as f64 / 255.0,
+                            b: BLACK.2 as f64 / 255.0,
+                            a: 1.0,
+                        }),
                         store: wgpu::StoreOp::Store,
                     },
                 })],
