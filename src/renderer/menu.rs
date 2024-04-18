@@ -16,9 +16,6 @@ use crate::renderer::utils::pipeline::{ColorPipeline, TexturePipeline};
 use crate::renderer::utils::quad::draw_texture_quad;
 
 struct Background {
-    pub image: RgbaImage,
-    pub texture: Texture,
-    pub view: TextureView,
     pub bind_group: BindGroup,
     pub vertex_buffer: Buffer,
     pub index_buffer: Buffer,
@@ -86,7 +83,9 @@ impl MenuRenderer {
         let width = bounds.width();
         let height = height + bounds.height();
 
-        brush.queue(&device, &queue, vec![&title, &info]).expect("Failed to draw main menu text");
+        let mut texts = Vec::<Section>::new();
+        texts.push(title);
+        texts.push(info);
 
         let projection_view_model_data = Mat4::orthographic_rh(0f32, config.width as f32, config.height as f32, 0f32, -1f32, 1f32);
         let projection_view_model_ref: &[f32; 16] = projection_view_model_data.as_ref();
@@ -110,8 +109,39 @@ impl MenuRenderer {
         let mut vertex_data: Vec<ColorVertex> = Vec::new();
         let mut index_data: Vec<u16> = Vec::new();
 
+        // Draw Main box
+
         draw_text_box(&mut vertex_data, &mut index_data, (left as u32, up as u32), (width as u32, height as u32), 15, 15);
+
+        // Draw buttons
+
+        let mut text = Vec::<String>::new();
+
+        for level_button in &logic.level_buttons {
+            draw_text_box(&mut vertex_data, &mut index_data, level_button.position, (250, 100), 0, 5);
+
+            let mut t = "Level ".to_owned();
+            t.push_str(level_button.id.to_string().as_str());
+            text.push(t);
+
+            let button = Section::default()
+                .add_text(
+                    Text::new(text.last().unwrap().clone().as_str())
+                        .with_scale(40.0)
+                        .with_color([IVORY.0 as f32 / 255.0, IVORY.1 as f32 / 255.0, IVORY.2 as f32 / 255.0, 1.0]),
+                )
+                .with_screen_position(LogicalPosition::new(level_button.position.0 + 25, level_button.position.1 + 30))
+                .with_layout(
+                    Layout::default()
+                        .line_breaker(BuiltInLineBreaker::AnyCharLineBreaker),
+                );
+
+            texts.push(button);
+        }
+
         let indices_count = index_data.len();
+
+        brush.queue(&device, &queue, texts).expect("Failed to draw main menu text");
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Menu VertexBuffer"),
@@ -210,9 +240,6 @@ impl MenuRenderer {
         });
 
         let background = Background {
-            image: diffuse_rgba,
-            texture: diffuse_texture,
-            view: diffuse_texture_view,
             bind_group: diffuse_bind_group,
             vertex_buffer: background_vertex_buffer,
             index_buffer: background_index_buffer,
