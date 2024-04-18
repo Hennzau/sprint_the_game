@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 use std::mem;
-use wgpu::{Adapter, BindGroupLayout, Device, Face, RenderPipeline, Sampler, Surface};
+use wgpu::{Adapter, BindGroupLayout, Device, Face, RenderPipeline, Sampler, Surface, SurfaceConfiguration};
 use crate::renderer::{ColorVertex, TextureVertex};
 
 pub struct ColorPipeline {
@@ -9,7 +9,7 @@ pub struct ColorPipeline {
 }
 
 impl ColorPipeline {
-    pub fn new(device: &Device, surface: &Surface, adapter: &Adapter) -> Self {
+    pub fn new(device: &Device, surface: &Surface, adapter: &Adapter, config: &SurfaceConfiguration) -> Self {
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("BindGroupLayout for ColorPipeline"),
             entries: &[
@@ -37,8 +37,6 @@ impl ColorPipeline {
             push_constant_ranges: &[],
         });
 
-        let swapchain_capabilities = surface.get_capabilities(&adapter);
-        let swapchain_format = swapchain_capabilities.formats[0];
         let vertex_size = mem::size_of::<ColorVertex>();
 
         let buffer_layout = wgpu::VertexBufferLayout {
@@ -69,7 +67,7 @@ impl ColorPipeline {
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
                 entry_point: "fs_main",
-                targets: &[Some(swapchain_format.into())],
+                targets: &[Some(config.format.into())],
             }),
             primitive: wgpu::PrimitiveState {
                 cull_mode: Some(Face::Front),
@@ -94,7 +92,7 @@ pub struct TexturePipeline {
 }
 
 impl TexturePipeline {
-    pub fn new(device: &Device, surface: &Surface, adapter: &Adapter) -> Self {
+    pub fn new(device: &Device, surface: &Surface, adapter: &Adapter, config: &SurfaceConfiguration) -> Self {
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("BindGroupLayout for TexturePipeline"),
             entries: &[
@@ -148,8 +146,6 @@ impl TexturePipeline {
             push_constant_ranges: &[],
         });
 
-        let swapchain_capabilities = surface.get_capabilities(&adapter);
-        let swapchain_format = swapchain_capabilities.formats[0];
         let vertex_size = mem::size_of::<TextureVertex>();
 
         let buffer_layout = wgpu::VertexBufferLayout {
@@ -180,7 +176,7 @@ impl TexturePipeline {
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
                 entry_point: "fs_main",
-                targets: &[Some(swapchain_format.into())],
+                targets: &[Some(config.format.into())],
             }),
             primitive: wgpu::PrimitiveState {
                 cull_mode: Some(Face::Front),

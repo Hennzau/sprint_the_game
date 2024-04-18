@@ -36,5 +36,7 @@ fn fs_main(
     vertex: VertexOutput
 
     ) -> @location(0) vec4<f32> {
-    return textureSample(texture_image, texture_sampler, vertex.texture_coordinate);
+    let color = textureSample(texture_image, texture_sampler, vertex.texture_coordinate);
+    // vec4<f32> (pow (color.x, 1.0 / 2.2), pow (color.y, 1.0 / 2.2), pow (color.z, 1.0 / 2.2), pow (color.w, 1.0 / 2.2))
+    return color;
 }

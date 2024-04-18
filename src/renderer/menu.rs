@@ -110,7 +110,7 @@ impl MenuRenderer {
         let mut vertex_data: Vec<ColorVertex> = Vec::new();
         let mut index_data: Vec<u16> = Vec::new();
 
-        draw_text_box(&mut vertex_data, &mut index_data, (left as u32, up as u32), (width as u32, height as u32));
+        draw_text_box(&mut vertex_data, &mut index_data, (left as u32, up as u32), (width as u32, height as u32), 15, 15);
         let indices_count = index_data.len();
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -137,13 +137,14 @@ impl MenuRenderer {
             height: dimensions.1,
             depth_or_array_layers: 1,
         };
+
         let diffuse_texture = device.create_texture(
             &wgpu::TextureDescriptor {
                 size: texture_size,
                 mip_level_count: 1,
                 sample_count: 1,
                 dimension: wgpu::TextureDimension::D2,
-                format: wgpu::TextureFormat::Rgba8UnormSrgb,
+                format: wgpu::TextureFormat::Rgba8Unorm,
                 usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
                 label: Some("diffuse_texture"),
                 view_formats: &[],

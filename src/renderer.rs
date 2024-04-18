@@ -54,8 +54,8 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(menu: &MenuLogic, play: &PlayLogic, victory: &VictoryLogic, edit: &EditLogic, device: &Device, surface: &Surface, adapter: &Adapter, queue: &Queue, config: &SurfaceConfiguration) -> Self {
-        let color = Rc::new(ColorPipeline::new(device, surface, adapter));
-        let texture = Rc::new(TexturePipeline::new(device, surface, adapter));
+        let color = Rc::new(ColorPipeline::new(device, surface, adapter, config));
+        let texture = Rc::new(TexturePipeline::new(device, surface, adapter, config));
         let menu = MenuRenderer::new(menu, color.clone(), texture.clone(), device, queue, config);
         let play = PlayRenderer::new(play, color.clone(), texture.clone(), device, surface, adapter, config);
         let victory = VictoryRenderer::new(victory, color.clone(), texture.clone());

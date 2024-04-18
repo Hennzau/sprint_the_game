@@ -3,14 +3,7 @@ use std::time::{
     Instant,
 };
 
-use wgpu::{
-    Adapter,
-    Device,
-    Instance,
-    Queue,
-    Surface,
-    SurfaceConfiguration,
-};
+use wgpu::{Adapter, Device, Instance, Queue, Surface, SurfaceConfiguration, TextureFormat};
 
 use winit::{
     event::{
@@ -68,9 +61,12 @@ async fn build_backend(window: &Window) -> (Instance, Surface, SurfaceConfigurat
     size.width = size.width.max(1);
     size.height = size.height.max(1);
 
-    let config = surface
+    let mut config = surface
         .get_default_config(&adapter, size.width, size.height)
         .unwrap();
+
+    config.format = TextureFormat::Bgra8Unorm;
+
     surface.configure(&device, &config);
 
     return (instance, surface, config, adapter, device, queue);
