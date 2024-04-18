@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::mem;
 use wgpu::{Adapter, BindGroupLayout, Device, Face, RenderPipeline, Sampler, Surface};
-use crate::renderer::ColorVertex;
+use crate::renderer::{ColorVertex, TextureVertex};
 
 pub struct ColorPipeline {
     pub layout: BindGroupLayout,
@@ -150,7 +150,7 @@ impl TexturePipeline {
 
         let swapchain_capabilities = surface.get_capabilities(&adapter);
         let swapchain_format = swapchain_capabilities.formats[0];
-        let vertex_size = mem::size_of::<ColorVertex>();
+        let vertex_size = mem::size_of::<TextureVertex>();
 
         let buffer_layout = wgpu::VertexBufferLayout {
             array_stride: vertex_size as wgpu::BufferAddress,
