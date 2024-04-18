@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use bytemuck::{Pod, Zeroable};
 use wgpu::{Adapter, Device, LoadOp, Operations, Queue, RenderPassColorAttachment, RenderPassDescriptor, Surface, SurfaceConfiguration};
 
@@ -14,7 +15,8 @@ use crate::renderer::{
     play::PlayRenderer,
     victory::VictoryRenderer,
 };
-use crate::renderer::palette::{BLACK, INCREASED_DARKBLUE};
+use crate::renderer::utils::palette::{BLACK, INCREASED_DARKBLUE};
+use crate::renderer::utils::pipeline::{ColorPipeline, TexturePipeline};
 
 use crate::sprint_the_game::State;
 
@@ -23,8 +25,8 @@ pub mod play;
 pub mod victory;
 pub mod edit;
 
-pub mod palette;
-pub mod quad;
+pub mod utils;
+
 
 #[repr(C)]
 #[derive(Clone, Copy, Pod, Zeroable)]
@@ -33,7 +35,17 @@ pub struct ColorVertex {
     color: [u8; 4],
 }
 
+#[repr(C)]
+#[derive(Clone, Copy, Pod, Zeroable)]
+pub struct TextureVertex {
+    position: [f32; 2],
+    texture: [f32; 2],
+}
+
 pub struct Renderer {
+    color: Rc<ColorPipeline>,
+    texture: Rc<TexturePipeline>,
+
     pub menu: MenuRenderer,
     pub play: PlayRenderer,
     pub victory: VictoryRenderer,
@@ -42,11 +54,20 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(menu: &MenuLogic, play: &PlayLogic, victory: &VictoryLogic, edit: &EditLogic, device: &Device, surface: &Surface, adapter: &Adapter, queue: &Queue, config: &SurfaceConfiguration) -> Self {
+        let color = Rc::new(ColorPipeline::new(device, surface, adapter));
+        let texture = Rc::new(TexturePipeline::new(device, surface, adapter));
+        let menu = MenuRenderer::new(menu, color.clone(), texture.clone(), device, queue, config);
+        let play = PlayRenderer::new(play, color.clone(), texture.clone(), device, surface, adapter, config);
+        let victory = VictoryRenderer::new(victory, color.clone(), texture.clone());
+        let edit = EditRenderer::new(edit, color.clone(), texture.clone());
+
         return Self {
-            menu: MenuRenderer::new(menu, device, queue, config),
-            play: PlayRenderer::new(play, device, surface, adapter, config),
-            victory: VictoryRenderer::new(victory),
-            edit: EditRenderer::new(edit),
+            color,
+            texture,
+            menu,
+            play,
+            victory,
+            edit,
         };
     }
 

@@ -5,7 +5,7 @@ struct VertexOutput {
 
 @group(0)
 @binding(0)
-var<uniform> projection_view_matrix: mat4x4<f32>;
+var<uniform> projection_view_model_matrix: mat4x4<f32>;
 
 @vertex
 fn vs_main(
@@ -16,7 +16,7 @@ fn vs_main(
 ) -> VertexOutput {
     var result: VertexOutput;
 
-    result.position = projection_view_matrix * vec4<f32> (position.x, position.y, 0.0, 1.0);
+    result.position = projection_view_model_matrix * vec4<f32> (position.x, position.y, 0.0, 1.0);
     result.color = color;
 
     return result;

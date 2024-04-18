@@ -31,6 +31,7 @@ use winit::{
         LogicalPosition,
     },
 };
+use winit::window::WindowButtons;
 use crate::sprint_the_game::Application;
 
 mod sprint_the_game;
@@ -83,6 +84,7 @@ fn main() {
         .with_title("Sprint The Game")
         .with_inner_size(LogicalSize::new(1280, 720))
         .with_resizable(false)
+        .with_enabled_buttons(WindowButtons::CLOSE | WindowButtons::MINIMIZE)
         .build(&event_loop).unwrap();
 
     if let Some(monitor) = window.current_monitor() {
@@ -138,12 +140,12 @@ fn main() {
                         WindowEvent::KeyboardInput {
                             event,
                             ..
-                        } => {}
+                        } => application.process_keyboard(event),
                         WindowEvent::MouseInput {
                             state,
                             button,
                             ..
-                        } => {}
+                        } => application.process_mouse(state, button),
                         _ => {}
                     }
                 }

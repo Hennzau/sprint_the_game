@@ -1,11 +1,19 @@
+use std::rc::Rc;
 use wgpu::{Queue, RenderPass};
 use crate::logic::edit::EditLogic;
+use crate::renderer::utils::pipeline::{ColorPipeline, TexturePipeline};
 
-pub struct EditRenderer {}
+pub struct EditRenderer {
+    color: Rc<ColorPipeline>,
+    texture: Rc<TexturePipeline>,
+}
 
 impl EditRenderer {
-    pub fn new(logic: &EditLogic) -> Self {
-        return Self {};
+    pub fn new(logic: &EditLogic, color: Rc<ColorPipeline>, texture: Rc<TexturePipeline>) -> Self {
+        return Self {
+            color,
+            texture
+        };
     }
 
     pub fn update(&mut self, logic: &EditLogic) {}
